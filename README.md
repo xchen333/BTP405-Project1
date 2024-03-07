@@ -6,6 +6,88 @@ This project is a Personal Health Record (PHR) system with a RESTful API. The sy
 
 You can set up this project using `docker-compose`.
 
+## Data Models
+
+The database is modeled as follows:
+
+### patient
+
+| Field                        | Type          | Constraints                             |
+|------------------------------|---------------|-----------------------------------------|
+| patient_uuid                 | UUID          | DEFAULT uuid_generate_v4() PRIMARY KEY |
+| first_name                   | VARCHAR(100)  | NOT NULL                                |
+| last_name                    | VARCHAR(100)  | NOT NULL                                |
+| date_of_birth                | DATE          |                                         |
+| gender                       | VARCHAR(10)   |                                         |
+| email                        | VARCHAR(255)  |                                         |
+| phone_number                 | VARCHAR(20)   |                                         |
+| emergency_contact_name       | VARCHAR(200)  |                                         |
+| emergency_contact_relationship| VARCHAR(20)   |                                         |
+| emergency_contact_number     | VARCHAR(20)   |                                         |
+| address                      | TEXT          |                                         |
+
+### doctor
+
+| Field            | Type          | Constraints                             |
+|------------------|---------------|-----------------------------------------|
+| doctor_uuid      | UUID          | DEFAULT uuid_generate_v4() PRIMARY KEY |
+| first_name       | VARCHAR(100)  | NOT NULL                                |
+| last_name        | VARCHAR(100)  | NOT NULL                                |
+| specialization   | VARCHAR(255)  |                                         |
+| email            | VARCHAR(255)  |                                         |
+| phone_number     | VARCHAR(20)   |                                         |
+| address          | TEXT          |                                         |
+
+### health_record
+
+| Field            | Type          | Constraints                             |
+|------------------|---------------|-----------------------------------------|
+| record_uuid      | UUID          | DEFAULT uuid_generate_v4() PRIMARY KEY |
+| patient_uuid     | UUID          | REFERENCES patient(patient_uuid)       |
+| doctor_uuid      | UUID          | REFERENCES doctor(doctor_uuid)         |
+| diagnosis        | TEXT          |                                         |
+| treatment        | TEXT          |                                         |
+| date             | DATE          |                                         |
+| notes            | TEXT          |                                         |
+
+### appointment
+
+| Field              | Type          | Constraints                             |
+|--------------------|---------------|-----------------------------------------|
+| appointment_uuid   | UUID          | DEFAULT uuid_generate_v4() PRIMARY KEY |
+| patient_uuid       | UUID          | REFERENCES patient(patient_uuid)       |
+| doctor_uuid        | UUID          | REFERENCES doctor(doctor_uuid)         |
+| date               | DATE          |                                         |
+| time               | VARCHAR(8)    |                                         |
+| location           | VARCHAR(255)  |                                         |
+| status             | VARCHAR(20)   |                                         |
+
+
+### medication
+
+| Field              | Type          | Constraints                             |
+|--------------------|---------------|-----------------------------------------|
+| medication_uuid    | UUID          | DEFAULT uuid_generate_v4() PRIMARY KEY |
+| name               | VARCHAR(255)  | NOT NULL                                |
+| manufacturer       | VARCHAR(255)  |                                         |
+| inventory          | INTEGER       | DEFAULT 0                               |
+
+
+### prescription
+
+| Field              | Type          | Constraints                             |
+|--------------------|---------------|-----------------------------------------|
+| prescription_uuid  | UUID          | DEFAULT uuid_generate_v4() PRIMARY KEY |
+| doctor_uuid        | UUID          | REFERENCES doctor(doctor_uuid)         |
+| patient_uuid       | UUID          | REFERENCES patient(patient_uuid)       |
+| medication_uuid    | UUID          | REFERENCES medication(medication_uuid) |
+| dosage             | VARCHAR(50)   |                                         |
+| frequency          | VARCHAR(50)   |                                         |
+| start_date         | DATE          |                                         |
+| end_date           | DATE          |                                         |
+| notes              | TEXT          |                                         |
+
+
 ## Setup
 
 ### Reverse Proxy (Optional)
