@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: iHS8tmZYwyK65X
+      POSTGRES_DB: phr
+    networks:
+      - mynetwork
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d phr -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+# To use a different username/password, change the following variables
+#    environment:
+#      API_USERNAME: admin
+#      API_PASSWORD: password
+    networks:
+      - mynetwork
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - mynetwork
+    depends_on:
+      - api
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+
+networks:
+  mynetwork:
